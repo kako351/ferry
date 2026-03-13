@@ -1,0 +1,24 @@
+name: ADBDesktop
+options:
+  bundleIdPrefix: com.adbdesktop
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+targets:
+  ADBDesktop:
+    type: application
+    platform: macOS
+    sources:
+      - ADBDesktop
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.adbdesktop.app
+        PRODUCT_NAME: ADB Desktop
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        ENABLE_APP_SANDBOX: false
+        SWIFT_EMIT_LOC_STRINGS: true
