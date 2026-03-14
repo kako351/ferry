@@ -3,6 +3,8 @@ import SwiftUI
 struct FeaturePanel: View {
     let feature: Feature
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -43,19 +45,19 @@ struct FeaturePanel: View {
     private var featureContent: some View {
         switch feature {
         case .textInput:
-            TextInputPanel(device: device)
+            TextInputPanel(device: device, service: service, serviceErrorMessage: serviceErrorMessage)
         case .urlScheme:
-            URLSchemePanel(device: device)
+            URLSchemePanel(device: device, service: service, serviceErrorMessage: serviceErrorMessage)
         case .screenshot:
-            ScreenshotPanel(device: device)
+            ScreenshotPanel(device: device, service: service, serviceErrorMessage: serviceErrorMessage)
         case .screenRecord:
-            ScreenRecordPanel(device: device)
+            ScreenRecordPanel(device: device, service: service, serviceErrorMessage: serviceErrorMessage)
         case .wifiConnection:
-            WiFiConnectionPanel(device: device)
+            WiFiConnectionPanel(device: device, service: service, serviceErrorMessage: serviceErrorMessage)
         case .proxySettings:
-            ProxySettingsPanel(device: device)
+            ProxySettingsPanel(device: device, service: service, serviceErrorMessage: serviceErrorMessage)
         case .commandPreset:
-            CommandPresetPanel(device: device)
+            CommandPresetPanel(device: device, service: service, serviceErrorMessage: serviceErrorMessage)
         }
     }
 }

@@ -36,7 +36,10 @@ final class CommandPresetViewModel {
         defer { isExecuting = false }
 
         do {
-            let args = preset.command.split(separator: " ").map(String.init)
+            let args = parseCommandArguments(preset.command)
+            guard !args.isEmpty else {
+                throw ADBError.commandFailed("コマンドが空です")
+            }
             lastOutput = try await service.execute(arguments: args, on: device)
         } catch {
             errorMessage = error.localizedDescription
@@ -112,5 +115,54 @@ final class CommandPresetViewModel {
     func cancelPresetEdit() {
         isAddingPreset = false
         editingPreset = nil
+    }
+
+    private func parseCommandArguments(_ command: String) -> [String] {
+        var args: [String] = []
+        var current = ""
+        var quote: Character?
+        var isEscaped = false
+
+        for char in command {
+            if isEscaped {
+                current.append(char)
+                isEscaped = false
+                continue
+            }
+
+            if char == "\\" {
+                isEscaped = true
+                continue
+            }
+
+            if char == "\"" || char == "'" {
+                if quote == nil {
+                    quote = char
+                } else if quote == char {
+                    quote = nil
+                } else {
+                    current.append(char)
+                }
+                continue
+            }
+
+            if char.isWhitespace && quote == nil {
+                if !current.isEmpty {
+                    args.append(current)
+                    current = ""
+                }
+                continue
+            }
+
+            current.append(char)
+        }
+
+        if isEscaped {
+            current.append("\\")
+        }
+        if !current.isEmpty {
+            args.append(current)
+        }
+        return args
     }
 }

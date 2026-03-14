@@ -19,10 +19,8 @@ final class WiFiConnectionViewModel {
         isConnecting = true
         defer { isConnecting = false }
 
-        // IPが未取得なら取得を試みる
-        if deviceIP == nil {
-            await fetchDeviceIP(device: device, using: service)
-        }
+        // 毎回最新のIPを取得してから接続する
+        await fetchDeviceIP(device: device, using: service)
 
         guard let ip = deviceIP else {
             errorMessage = "デバイスのIPアドレスを取得できません。Wi-Fiに接続されているか確認してください。"
@@ -40,10 +38,16 @@ final class WiFiConnectionViewModel {
     }
 
     func disconnect(device: Device, using service: ADBService) async {
-        guard let ip = deviceIP else { return }
-
         isConnecting = true
         defer { isConnecting = false }
+
+        if deviceIP == nil {
+            await fetchDeviceIP(device: device, using: service)
+        }
+        guard let ip = deviceIP else {
+            errorMessage = "接続先IPが不明なため切断できませんでした。"
+            return
+        }
 
         do {
             try await service.disconnect(from: "\(ip):5555")

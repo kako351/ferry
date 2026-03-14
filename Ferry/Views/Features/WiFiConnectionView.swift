@@ -2,6 +2,8 @@ import SwiftUI
 
 struct WiFiConnectionPanel: View {
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
     @State private var viewModel = WiFiConnectionViewModel()
 
     var body: some View {
@@ -25,7 +27,11 @@ struct WiFiConnectionPanel: View {
 
             if viewModel.isWiFiConnected {
                 Button {
-                    guard let device, let service = try? ADBService() else { return }
+                    guard let device else { return }
+                    guard let service else {
+                        viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                        return
+                    }
                     Task { await viewModel.disconnect(device: device, using: service) }
                 } label: {
                     Label("切断", systemImage: "wifi.slash")
@@ -34,7 +40,11 @@ struct WiFiConnectionPanel: View {
                 .buttonStyle(ActionButtonStyle(color: .red, isDisabled: device == nil || viewModel.isConnecting))
             } else {
                 Button {
-                    guard let device, let service = try? ADBService() else { return }
+                    guard let device else { return }
+                    guard let service else {
+                        viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                        return
+                    }
                     Task { await viewModel.connectViaWiFi(device: device, using: service) }
                 } label: {
                     Label("Wi-Fiに切り替え", systemImage: "wifi")
@@ -55,7 +65,7 @@ struct WiFiConnectionPanel: View {
         }
         .errorAlert($viewModel.errorMessage)
         .task(id: device?.id) {
-            guard let device, let service = try? ADBService() else { return }
+            guard let device, let service else { return }
             await viewModel.fetchDeviceIP(device: device, using: service)
         }
     }

@@ -2,6 +2,8 @@ import SwiftUI
 
 struct TextInputPanel: View {
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
     @State private var viewModel = TextInputViewModel()
 
     var body: some View {
@@ -46,12 +48,20 @@ struct TextInputPanel: View {
     }
 
     private func send() {
-        guard let device, let service = try? ADBService() else { return }
+        guard let device else { return }
+        guard let service else {
+            viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+            return
+        }
         Task { await viewModel.sendText(to: device, using: service) }
     }
 
     private func resend(_ text: String) {
-        guard let device, let service = try? ADBService() else { return }
+        guard let device else { return }
+        guard let service else {
+            viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+            return
+        }
         Task { await viewModel.resend(text, to: device, using: service) }
     }
 }

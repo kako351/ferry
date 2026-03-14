@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ScreenRecordPanel: View {
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
     @State private var viewModel = ScreenRecordViewModel()
 
     var body: some View {
@@ -17,7 +19,11 @@ struct ScreenRecordPanel: View {
                 }
 
                 Button {
-                    guard let device, let service = try? ADBService() else { return }
+                    guard let device else { return }
+                    guard let service else {
+                        viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                        return
+                    }
                     Task { await viewModel.stopRecording(on: device, using: service) }
                 } label: {
                     Label("停止", systemImage: "stop.fill")
@@ -26,7 +32,11 @@ struct ScreenRecordPanel: View {
                 .buttonStyle(ActionButtonStyle(color: .red, isDisabled: false))
             } else {
                 Button {
-                    guard let device, let service = try? ADBService() else { return }
+                    guard let device else { return }
+                    guard let service else {
+                        viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                        return
+                    }
                     Task { await viewModel.startRecording(on: device, using: service) }
                 } label: {
                     Label("録画開始", systemImage: "record.circle")

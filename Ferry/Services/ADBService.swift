@@ -4,6 +4,7 @@ import Foundation
 final class ADBService {
     let adbPath: String
     private var recordingProcess: Process?
+    private var recordingRemotePath: String?
 
     init() throws {
         self.adbPath = try ADBPathResolver.resolve()
@@ -68,6 +69,7 @@ final class ADBService {
 
         try process.run()
         recordingProcess = process
+        recordingRemotePath = remotePath
     }
 
     func stopRecording(on device: Device, saveTo directory: URL) async throws -> URL {
@@ -77,17 +79,18 @@ final class ADBService {
         }
         recordingProcess = nil
 
+        guard let remotePath = recordingRemotePath else {
+            throw ADBError.commandFailed("録画中のファイル情報が見つかりません")
+        }
+        recordingRemotePath = nil
+
         // 録画ファイルを端末から取得
         try await Task.sleep(for: .seconds(1))
-        let remoteFiles = try await runADB(["-s", device.serialNumber, "shell", "ls", "/sdcard/recording_*.mp4"])
-        guard let latestFile = remoteFiles.split(separator: "\n").last.map(String.init) else {
-            throw ADBError.commandFailed("録画ファイルが見つかりません")
-        }
 
-        let fileName = URL(fileURLWithPath: latestFile).lastPathComponent
+        let fileName = URL(fileURLWithPath: remotePath).lastPathComponent
         let localPath = directory.appendingPathComponent(fileName)
-        _ = try await runADB(["-s", device.serialNumber, "pull", latestFile.trimmingCharacters(in: .whitespacesAndNewlines), localPath.path])
-        _ = try await runADB(["-s", device.serialNumber, "shell", "rm", latestFile.trimmingCharacters(in: .whitespacesAndNewlines)])
+        _ = try await runADB(["-s", device.serialNumber, "pull", remotePath, localPath.path])
+        _ = try await runADB(["-s", device.serialNumber, "shell", "rm", remotePath])
 
         return localPath
     }
@@ -170,8 +173,11 @@ final class ADBService {
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let output = String(data: data, encoding: .utf8) ?? ""
 
-            if process.terminationStatus != 0 && !output.isEmpty {
-                continuation.resume(throwing: ADBError.commandFailed(output))
+            if process.terminationStatus != 0 {
+                let message = output.isEmpty
+                    ? "終了コード: \(process.terminationStatus)"
+                    : output
+                continuation.resume(throwing: ADBError.commandFailed(message))
             } else {
                 continuation.resume(returning: output)
             }

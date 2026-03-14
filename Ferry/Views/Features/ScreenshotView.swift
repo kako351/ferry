@@ -2,12 +2,18 @@ import SwiftUI
 
 struct ScreenshotPanel: View {
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
     @State private var viewModel = ScreenshotViewModel()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
-                guard let device, let service = try? ADBService() else { return }
+                guard let device else { return }
+                guard let service else {
+                    viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                    return
+                }
                 Task { await viewModel.takeScreenshot(from: device, using: service) }
             } label: {
                 Label("保存", systemImage: "square.and.arrow.down")
@@ -16,7 +22,11 @@ struct ScreenshotPanel: View {
             .buttonStyle(ActionButtonStyle(color: .blue, isDisabled: device == nil || viewModel.isTaking))
 
             Button {
-                guard let device, let service = try? ADBService() else { return }
+                guard let device else { return }
+                guard let service else {
+                    viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                    return
+                }
                 Task { await viewModel.takeScreenshotToClipboard(from: device, using: service) }
             } label: {
                 Label("クリップボードにコピー", systemImage: "doc.on.doc")

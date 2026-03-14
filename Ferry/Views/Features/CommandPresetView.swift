@@ -2,6 +2,8 @@ import SwiftUI
 
 struct CommandPresetPanel: View {
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
     @State private var viewModel = CommandPresetViewModel()
 
     var body: some View {
@@ -47,7 +49,11 @@ struct CommandPresetPanel: View {
                             Spacer()
 
                             Button {
-                                guard let device, let service = try? ADBService() else { return }
+                                guard let device else { return }
+                                guard let service else {
+                                    viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                                    return
+                                }
                                 Task { await viewModel.launchApp(entry, on: device, using: service) }
                             } label: {
                                 Image(systemName: "play.fill")
@@ -117,7 +123,11 @@ struct CommandPresetPanel: View {
                             Spacer()
 
                             Button {
-                                guard let device, let service = try? ADBService() else { return }
+                                guard let device else { return }
+                                guard let service else {
+                                    viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                                    return
+                                }
                                 Task { await viewModel.executePreset(preset, on: device, using: service) }
                             } label: {
                                 Image(systemName: "play.fill")

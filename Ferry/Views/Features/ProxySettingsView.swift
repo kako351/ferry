@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ProxySettingsPanel: View {
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
     @State private var viewModel = ProxyViewModel()
 
     var body: some View {
@@ -43,7 +45,11 @@ struct ProxySettingsPanel: View {
 
             if viewModel.isProxyEnabled {
                 Button {
-                    guard let device, let service = try? ADBService() else { return }
+                    guard let device else { return }
+                    guard let service else {
+                        viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                        return
+                    }
                     Task { await viewModel.disableProxy(device: device, using: service) }
                 } label: {
                     Label("オフにする", systemImage: "xmark.circle")
@@ -52,7 +58,11 @@ struct ProxySettingsPanel: View {
                 .buttonStyle(ActionButtonStyle(color: .red, isDisabled: viewModel.isToggling))
             } else {
                 Button {
-                    guard let device, let service = try? ADBService() else { return }
+                    guard let device else { return }
+                    guard let service else {
+                        viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                        return
+                    }
                     Task { await viewModel.enableProxy(device: device, using: service) }
                 } label: {
                     Label("オンにする", systemImage: "checkmark.circle")
@@ -73,7 +83,7 @@ struct ProxySettingsPanel: View {
         }
         .errorAlert($viewModel.errorMessage)
         .task(id: device?.id) {
-            guard let device, let service = try? ADBService() else { return }
+            guard let device, let service else { return }
             await viewModel.fetchStatus(device: device, using: service)
         }
     }

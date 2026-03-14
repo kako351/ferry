@@ -91,7 +91,9 @@ struct ContentView: View {
                         ForEach(row) { feature in
                             FeaturePanel(
                                 feature: feature,
-                                device: deviceViewModel.selectedDevice
+                                device: deviceViewModel.selectedDevice,
+                                service: deviceViewModel.service,
+                                serviceErrorMessage: deviceViewModel.errorMessage
                             )
                         }
                     }

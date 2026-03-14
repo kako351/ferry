@@ -2,6 +2,8 @@ import SwiftUI
 
 struct URLSchemePanel: View {
     let device: Device?
+    let service: ADBService?
+    let serviceErrorMessage: String?
     @State private var viewModel = URLSchemeViewModel()
 
     var body: some View {
@@ -92,7 +94,11 @@ struct URLSchemePanel: View {
                 Spacer()
 
                 Button {
-                    guard let device, let service = try? ADBService() else { return }
+                    guard let device else { return }
+                    guard let service else {
+                        viewModel.errorMessage = serviceErrorMessage ?? ADBError.adbNotFound.localizedDescription
+                        return
+                    }
                     Task { await viewModel.sendURL(scheme, to: device, using: service) }
                 } label: {
                     Label("送信", systemImage: "paperplane.fill")
