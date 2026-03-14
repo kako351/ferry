@@ -2,7 +2,7 @@
 
 ほとんどの ADB 操作をワンクリックで完結させる、macOS ネイティブアプリケーション。
 
-![Ferry スクリーンショット](docs/assets/screenshot.png)
+![Ferry スクリーンショット](docs/assets/screenshot_v2.png)
 
 ## 概要
 
