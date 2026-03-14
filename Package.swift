@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "ADBDesktop",
+    name: "Ferry",
     platforms: [
         .macOS(.v14)
     ],
     targets: [
         .executableTarget(
-            name: "ADBDesktop",
-            path: "ADBDesktop"
+            name: "Ferry",
+            path: "Ferry"
         )
     ]
 )

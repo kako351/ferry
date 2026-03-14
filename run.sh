@@ -3,13 +3,13 @@ set -e
 
 swift build
 
-APP_DIR=".build/debug/ADBDesktop.app/Contents/MacOS"
+APP_DIR=".build/debug/Ferry.app/Contents/MacOS"
 mkdir -p "$APP_DIR"
 
-cp .build/debug/ADBDesktop "$APP_DIR/ADBDesktop"
+cp .build/debug/Ferry "$APP_DIR/Ferry"
 
 # Info.plist（初回のみ）
-PLIST=".build/debug/ADBDesktop.app/Contents/Info.plist"
+PLIST=".build/debug/Ferry.app/Contents/Info.plist"
 if [ ! -f "$PLIST" ]; then
 cat > "$PLIST" << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -17,11 +17,11 @@ cat > "$PLIST" << 'EOF'
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>ADBDesktop</string>
+    <string>Ferry</string>
     <key>CFBundleIdentifier</key>
-    <string>com.adbdesktop.app</string>
+    <string>com.ferry.app</string>
     <key>CFBundleName</key>
-    <string>ADB Desktop</string>
+    <string>Ferry</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -33,6 +33,6 @@ cat > "$PLIST" << 'EOF'
 EOF
 fi
 
-pkill -f "ADBDesktop.app" 2>/dev/null || true
+pkill -f "Ferry.app" 2>/dev/null || true
 sleep 0.3
-open .build/debug/ADBDesktop.app
+open .build/debug/Ferry.app

@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ADBDesktopApp: App {
+struct FerryApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
