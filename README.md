@@ -2,6 +2,8 @@
 
 ほとんどの ADB 操作をワンクリックで完結させる、macOS ネイティブアプリケーション。
 
+![Ferry スクリーンショット](docs/assets/screenshot.png)
+
 ## 概要
 
 Ferry は Android Debug Bridge (adb) の GUI フロントエンドです。コマンドを覚えたり入力したりする手間を省き、Android 開発中の頻出操作をワンクリックで実行できます。
