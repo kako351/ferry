@@ -82,6 +82,9 @@ struct ProxySettingsPanel: View {
             }
         }
         .errorAlert($viewModel.errorMessage)
+        .task {
+            await viewModel.refreshLocalIP()
+        }
         .task(id: device?.id) {
             guard let device, let service else { return }
             await viewModel.fetchStatus(device: device, using: service)

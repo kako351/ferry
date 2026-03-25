@@ -6,13 +6,19 @@ final class ProxyViewModel {
     private(set) var isToggling = false
     private(set) var currentProxy: String?
     var port: String = "8080"
+    private(set) var localIP: String?
 
     var isProxyEnabled: Bool {
         currentProxy != nil
     }
 
-    var localIP: String? {
-        NetworkService.getLocalIPAddress()
+    func refreshLocalIP() async {
+        let ip = await Task.detached {
+            NetworkService.getLocalIPAddress()
+        }.value
+        await MainActor.run {
+            self.localIP = ip
+        }
     }
 
     func fetchStatus(device: Device, using service: ADBService) async {

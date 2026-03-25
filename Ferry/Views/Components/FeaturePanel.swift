@@ -33,9 +33,8 @@ struct FeaturePanel: View {
             // コンテンツ
             featureContent
                 .padding(16)
-                .frame(maxHeight: .infinity, alignment: .top)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .frame(maxWidth: .infinity, alignment: .top)
         .background(.background)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .black.opacity(0.06), radius: 3, y: 1)

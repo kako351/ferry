@@ -3,13 +3,6 @@ import SwiftUI
 struct ContentView: View {
     @State private var deviceViewModel = DeviceViewModel()
 
-    private var features: [[Feature]] {
-        let all = Feature.allCases
-        return stride(from: 0, to: all.count, by: 3).map { i in
-            Array(all[i..<min(i + 3, all.count)])
-        }
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             deviceBar
@@ -85,18 +78,18 @@ struct ContentView: View {
 
     private var panelGrid: some View {
         ScrollView {
-            Grid(alignment: .topLeading, horizontalSpacing: 12, verticalSpacing: 12) {
-                ForEach(Array(features.enumerated()), id: \.offset) { _, row in
-                    GridRow {
-                        ForEach(row) { feature in
-                            FeaturePanel(
-                                feature: feature,
-                                device: deviceViewModel.selectedDevice,
-                                service: deviceViewModel.service,
-                                serviceErrorMessage: deviceViewModel.errorMessage
-                            )
-                        }
-                    }
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 3),
+                alignment: .leading,
+                spacing: 12
+            ) {
+                ForEach(Feature.allCases) { feature in
+                    FeaturePanel(
+                        feature: feature,
+                        device: deviceViewModel.selectedDevice,
+                        service: deviceViewModel.service,
+                        serviceErrorMessage: deviceViewModel.errorMessage
+                    )
                 }
             }
             .padding(16)
